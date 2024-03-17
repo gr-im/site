@@ -14,6 +14,7 @@ _build/
 # ocamlbuild targets
 *.byte
 *.native
+*.exe
 
 # oasis generated files
 setup.data
@@ -27,3 +28,6 @@ setup.log
 
 # Local OPAM switch
 _opam/
+
+# Yocaml generated website
+_site/

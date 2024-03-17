@@ -1,0 +1,4 @@
+(library
+ (name generator)
+ (public_name site.generator)
+ (libraries yocaml))
