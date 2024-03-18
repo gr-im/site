@@ -64,11 +64,13 @@ body > main > article > h4 {
 body > main > article > pre {
     font-family: var(--monospace);
     margin-left: 32px;
+    margin-bottom: 32px;
     color: var(--light-color);
 }
 
-body > main > article > pre > code {
+body > main code {
     font-family: var(--monospace);
+    color: var(--light-color);
 }
 
 ol.bibliography > li {
