@@ -1,0 +1,15 @@
+<article>{%- autoescape false -%}{{ body }}{%- endautoescape -%}</article>
+
+<h3>Articles</h3>
+
+<ul class="articles-list">
+  {%- for article in articles -%}
+  <li>
+    <span class="date">{{ article.date.canonical }}</span>
+    <span class="title"
+      ><a href="/a/{{ article.url }}">{{ article.title }}</a></span
+    >
+    <p>{{ article.description }}</p>
+  </li>
+  {%- endfor -%}
+</ul>

@@ -1,0 +1,114 @@
+:root {
+    --serif: serif;
+    --sans-serif: sans-serif;
+    --monospace: monospace;
+    --global-bg-color: #fff;
+    --global-color: #000;
+    --light-color: #666;
+}
+
+body {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.4;
+    min-height: 100vh;
+    background-color: var(--global-bg-color);
+    color: var(--global-color);
+    display: flex;
+    flex-direction: column;
+}
+
+body > header,
+body > main,
+body > footer {
+    max-width: 960px;
+    margin: 0 64px;
+}
+
+body > header {
+    margin-top: 32px;
+}
+
+body > main {
+    margin: 32px 64px;
+    flex: 1;
+}
+
+body > footer {
+    border-top: 1px solid var(--light-color);
+    margin: 32px 64px;
+    padding-top: 32px;
+}
+
+body > main > article > p {
+    margin: 24px 0 32px 0;
+}
+
+body > main > article > blockquote {
+    margin: 24px 0 32px 32px;
+}
+
+body > main > article > h2 {
+    margin: 64px 0 32px 0;
+}
+
+body > main h3,
+body > main > article > h3 {
+    margin: 40px 0 28px 0;
+}
+
+body > main > article > h4 {
+    margin: 32px 0 20px 0;
+}
+
+body > main > article > pre {
+    font-family: var(--monospace);
+    margin-left: 32px;
+    color: var(--light-color);
+}
+
+body > main > article > pre > code {
+    font-family: var(--monospace);
+}
+
+ol.bibliography > li {
+    margin-bottom: 12px;
+}
+
+ol.bibliography > li .date {
+    margin-left: 12px;
+}
+
+ol.bibliography > li .authors {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+ol.bibliography > li .authors > li {
+    display: inline-block;
+}
+
+ol.bibliography > li .authors > li::before {
+    content: ", ";
+}
+
+ol.bibliography > li .authors > li:first-child::before {
+    content: "";
+}
+
+.articles-list > li {
+    margin-bottom: 32px;
+}
+
+.articles-list > li > .date {
+    color: var(--light-color);
+}
+
+.articles-list > li > .title {
+    font-weight: 600;
+}
+
+.articles-list > li > p {
+    font-style: italic;
+}

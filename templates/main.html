@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>gr-im.github.io - {{ title }}</title>
+    <meta name="description" content="{{ description }}" />
+    <meta name="author" content="Grim" />
+    <meta name="twitter:creator" content="@grimfw" />
+    <meta name="og:title" content="{{ title }}" />
+    <meta name="twitter:title" content="{{ title }}" />
+    <meta name="og:description" content="{{ description }}" />
+    <meta name="twitter:description" content="{{ description }}" />
+    {%- if has_tags -%}
+    <meta name="keywords" content="{{ meta_tags }}" />
+    {%- endif -%}
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <header>
+      <h2><a href="/">Grim's web corner</a></h2>
+      <p><i>Notes, essays and ramblings</i></p>
+    </header>
+    <main>{%- autoescape false -%}{{ body }}{%- endautoescape -%}</main>
+    <footer>
+      <p>
+        Crafted with <a href="https://github.com/xhtmlboi/yocaml">YOCaml</a>
+      </p>
+    </footer>
+  </body>
+</html>

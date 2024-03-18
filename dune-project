@@ -23,6 +23,7 @@
     (yocaml_yaml (= 1.0.0))
     (yocaml_jingoo (= 1.0.0))
     (yocaml_syndication (= 1.0.0))
+    (cmarkit (= 0.3.0))
     (ocamlformat (and :with-dev-setup (= 0.26.1)))
     (ocp-indent :with-dev-setup)
     (merlin :with-dev-setup)
