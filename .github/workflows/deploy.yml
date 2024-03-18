@@ -1,0 +1,31 @@
+name: deploy
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: YOCaml
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 5.1.1
+          opam-depext-flags: --with-test
+
+      - run: opam install . --deps-only --with-doc --with-test
+      - run: opam exec -- dune build --profile=release
+      - run: opam exec -- dune exec bin/site.exe -- build
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          publish_dir: ./_site
+          external_repository: gr-im/gr-im.github.io
+          publish_branch: master
+          enable_jekyll: false
