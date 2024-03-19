@@ -12,5 +12,5 @@ across various channels, as well as to document experimental endeavours. The
 material featured on this website is licensed under [CC BY-SA
 4.0](https://creativecommons.org/licenses/by-sa/4.0/), unless otherwise
 specified. I mainly use **Mastodon**
-([`grm@functional.cafe`](https://functional.cafe/@grm)) as a public
+([grm@functional.cafe](https://functional.cafe/@grm)) as a public
 communication channel.
