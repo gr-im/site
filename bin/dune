@@ -1,5 +1,4 @@
 (executable
  (name "site")
  (public_name "site")
- (promote (until-clean))
- (libraries fmt.tty logs logs.fmt cmdliner yocaml_unix generator))
+ (libraries cmdliner yocaml_eio generator))

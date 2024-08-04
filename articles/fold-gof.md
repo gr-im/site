@@ -5,7 +5,7 @@ description:
   Summary of a response regarding the encoding of visitors without 
   pattern matching in OCaml, using the fold function.
   
-referenced_people:
+referenced_humans:
   - [hakimba, https://hakimba.github.io/oxywa/]
   - [xvw, https://xvw.lol]
   
@@ -128,9 +128,10 @@ end
 Now, we shall implement the constructors `some` and `none` so that they adhere
 to this interface:
 
+<!-- $MDX skip -->
 ```ocaml
 module Option_obj : sig
-  val some : 'a   -> 'a option_obj
+  val some : 'a -> 'a option_obj
   val none : unit -> 'a option_obj 
   val fold : 'a option_obj -> ('a -> 'b) -> (unit -> 'b) -> 'b
 end

@@ -4,7 +4,8 @@
 </aside>
 
 <article>
-  {%- autoescape false -%}{{ body }}{%- endautoescape -%} {%- if has_bib -%}
+  {%- autoescape false -%}{{ yocaml_body }}{%- endautoescape -%} {%- if has_bib
+  -%}
   <h3>Bibliography</h3>
   <ol class="bibliography">
     {%- for ref in bib -%}

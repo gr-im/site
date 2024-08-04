@@ -1,9 +1,11 @@
-open Yocaml.Filepath
+open Yocaml
 
-let css ~target = "style.css" |> into "css" |> into target
+let css ~target = Path.(target / "css" / "style.css")
 
 let page ~target page_file =
-  basename @@ replace_extension page_file "html" |> into target
+  page_file |> Path.move ~into:target |> Path.change_extension "html"
 
 let article ~target article_file =
-  basename @@ replace_extension article_file "html" |> into "a" |> into target
+  article_file
+  |> Path.(move ~into:(target / "a"))
+  |> Path.change_extension "html"

@@ -1,202 +1,181 @@
 open Yocaml
 
-module type VALIDABLE = Metadata.VALIDABLE
-module type INJECTABLE = Key_value.DESCRIBABLE
-
-module Common = struct
+module Page = struct
   type t = { title : string; description : string; tags : string list }
 
-  let validate (type a) (module V : VALIDABLE with type t = a) o =
-    let open Validate.Applicative in
-    let open V in
-    let+ title = required_assoc string "title" o
-    and+ description = required_assoc string "description" o
-    and+ tags = optional_assoc_or ~default:[] (list_of string) "tags" o in
+  let entity_name = "Page"
+  let neutral = Metadata.required entity_name
+
+  let validate_underlying_page fields =
+    let open Data.Validation in
+    let+ title = required fields "title" string
+    and+ description = required fields "description" string
+    and+ tags = optional_or fields ~default:[] "tags" (list_of string) in
     { title; description; tags }
 
-  let inject (type a) (module L : INJECTABLE with type t = a)
-      { title; description; tags } =
-    L.
+  let validate = Data.Validation.record validate_underlying_page
+
+  let normalize { title; description; tags } =
+    let open Data in
+    [
+      ("title", string title)
+    ; ("description", string description)
+    ; ("has_tags", bool @@ not (List.is_empty tags))
+    ; ("tags", list_of string tags)
+    ; ("meta_tags", string @@ String.concat ", " tags)
+    ]
+end
+
+let list_to_bib f list =
+  List.fold_left
+    (fun acc elt ->
+      let ident, url = f elt in
+      acc ^ Format.asprintf "[%s]: %s" ident url ^ "\n")
+    "" list
+
+module Human = struct
+  type t = { ident : string; url : string }
+
+  let validate x =
+    let open Data.Validation in
+    let* humans = list_of string x in
+    match humans with
+    | ident :: url :: _ -> Ok { ident; url }
+    | _ -> fail_with ~given:"human list" "Invalid list of humans"
+
+  let to_string = list_to_bib (fun { ident; url } -> (ident, url))
+end
+
+module Bib = struct
+  type t = {
+      ident : string
+    ; title : string
+    ; authors : string list
+    ; year : int option
+    ; url : string
+  }
+
+  let valdiate =
+    let open Data.Validation in
+    record (fun fields ->
+        let+ ident = required fields "ident" string
+        and+ title = required fields "title" string
+        and+ authors = required fields "authors" (list_of string)
+        and+ year = optional fields "year" int
+        and+ url = required fields "url" string in
+        { ident; title; authors; year; url })
+
+  let normalize { title; authors; year; url; _ } =
+    let open Data in
+    record
       [
         ("title", string title)
-      ; ("description", string description)
-      ; ("tags", list @@ List.map string tags)
-      ; ("has_tags", boolean @@ not (List.is_empty tags))
-      ; ("meta_tags", string @@ String.concat ", " tags)
+      ; ("authors", list_of string authors)
+      ; ("year", option int year)
+      ; ("url", string url)
       ]
-end
 
-module Ref = struct
-  module People = struct
-    type t = { ident : string; url : string }
-
-    let validate (type a) (module V : VALIDABLE with type t = a) o =
-      let open Validate.Monad in
-      let* l = V.list_of V.string o in
-      match l with
-      | ident :: url :: _ -> Validate.valid { ident; url }
-      | _ -> Validate.error @@ Error.Invalid_metadata "Ref.People"
-
-    let to_string l =
-      l
-      |> List.map (fun { ident; url } -> Format.asprintf {|[%s]: %s|} ident url)
-      |> String.concat "\n"
-  end
-
-  module Bib = struct
-    type t = {
-        ident : string
-      ; title : string
-      ; authors : string list
-      ; year : int option
-      ; url : string
-    }
-
-    let validate (type a) (module V : VALIDABLE with type t = a) o =
-      let open Validate.Applicative in
-      let open V in
-      let+ ident = required_assoc string "ident" o
-      and+ title = required_assoc string "title" o
-      and+ authors = required_assoc (list_of string) "authors" o
-      and+ year = optional_assoc integer "year" o
-      and+ url = required_assoc string "url" o in
-      { ident; title; authors; year; url }
-
-    let from (type a) (module V : VALIDABLE with type t = a) obj =
-      V.object_and (validate (module V)) obj
-
-    let to_string l =
-      l
-      |> List.map (fun { ident; url; _ } ->
-             Format.asprintf {|[%s]: %s|} ident url)
-      |> String.concat "\n"
-
-    let inject (type a) (module L : INJECTABLE with type t = a)
-        { ident = _; title; authors; year; url } =
-      L.
-        [
-          ("title", string title)
-        ; ("authors", list @@ List.map string authors)
-        ; ("has_year", boolean @@ Option.is_some year)
-        ; ("year", Option.fold ~none:null ~some:integer year)
-        ; ("url", string url)
-        ]
-  end
-end
-
-module Page = struct
-  type t = { common : Common.t }
-
-  let validate (type a) (module V : VALIDABLE with type t = a) o =
-    let open Validate.Applicative in
-    let+ common = Common.validate (module V) o in
-    { common }
-
-  let from (type a) (module V : VALIDABLE with type t = a) obj =
-    V.object_and (validate (module V)) obj
-
-  let from_string (module V : VALIDABLE) = function
-    | None -> Error.(to_validate @@ Required_metadata [ "Page" ])
-    | Some s -> Validate.Monad.(s |> V.from_string >>= from (module V))
-
-  let inject (type a) (module L : INJECTABLE with type t = a) { common } =
-    Common.inject (module L) common @ []
+  let to_string = list_to_bib (fun { ident; url; _ } -> (ident, url))
 end
 
 module Article = struct
   type t = {
-      common : Common.t
-    ; date : Metadata.Date.t
-    ; referenced_people : Ref.People.t list
-    ; bib : Ref.Bib.t list
+      page : Page.t
+    ; date : Archetype.Datetime.t
+    ; referenced_humans : Human.t list
+    ; bib : Bib.t list
   }
 
-  let validate (type a) (module V : VALIDABLE with type t = a) o =
-    let open Validate.Applicative in
-    let open V in
-    let+ common = Common.validate (module V) o
-    and+ date = required_assoc (Metadata.Date.from (module V)) "date" o
-    and+ bib =
-      optional_assoc_or ~default:[] (list_of @@ Ref.Bib.from (module V)) "bib" o
-    and+ referenced_people =
-      optional_assoc_or ~default:[]
-        (list_of @@ Ref.People.validate (module V))
-        "referenced_people" o
-    in
-    { common; date; referenced_people; bib }
+  let entity_name = "Article"
+  let neutral = Metadata.required entity_name
 
-  let from (type a) (module V : VALIDABLE with type t = a) obj =
-    V.object_and (validate (module V)) obj
+  let validate =
+    let open Data.Validation in
+    record (fun fields ->
+        let+ page = Page.validate_underlying_page fields
+        and+ date = required fields "date" Archetype.Datetime.validate
+        and+ bib = optional_or fields "bib" ~default:[] (list_of Bib.valdiate)
+        and+ referenced_humans =
+          optional_or fields "referenced_humans" ~default:[]
+            (list_of @@ Human.validate)
+        in
 
-  let from_string (module V : VALIDABLE) = function
-    | None -> Error.(to_validate @@ Required_metadata [ "Article" ])
-    | Some s -> Validate.Monad.(s |> V.from_string >>= from (module V))
+        { page; date; referenced_humans; bib })
 
-  let inject (type a) (module L : INJECTABLE with type t = a)
-      { common; date; bib; referenced_people = _ } =
-    Common.inject (module L) common
-    @ L.
-        [
-          ("date", object_ @@ Metadata.Date.inject (module L) date)
-        ; ("has_bib", boolean @@ not (List.is_empty bib))
-        ; ( "bib"
-          , list
-            @@ List.map (fun x -> object_ @@ Ref.Bib.inject (module L) x) bib )
-        ]
+  let normalize { page; date; bib; _ } =
+    let open Yocaml.Data in
+    Page.normalize page
+    @ [
+        ("date", Archetype.Datetime.normalize date)
+      ; ("has_bib", bool (not (List.is_empty bib)))
+      ; ("bib", list_of Bib.normalize bib)
+      ]
 
   let prepare =
-    Build.arrow (fun (meta, content) ->
+    Task.lift ~has_dynamic_dependencies:false (fun (meta, content) ->
         ( meta
         , content
           ^ "\n\n"
-          ^ Ref.People.to_string meta.referenced_people
-          ^ "\n"
-          ^ Ref.Bib.to_string meta.bib ))
+          ^ Human.to_string meta.referenced_humans
+          ^ Bib.to_string meta.bib ))
+
+  let compare { date = a; _ } { date = b; _ } = Archetype.Datetime.compare a b
 end
 
 module Articles = struct
-  type t = { common : Common.t; articles : (Article.t * string) list }
+  type t = { page : Page.t; articles : (Path.t * Article.t) list }
 
-  let get_article (module V : VALIDABLE) file =
-    let arr = Build.read_file_with_metadata (module V) (module Article) file in
-    let deps = Build.get_dependencies arr in
-    let task = Build.get_task arr in
-    let+ meta, _ = task () in
-    (deps, (meta, Filepath.(basename @@ replace_extension file "html")))
+  let entity_name = "Articles"
+  let neutral = Metadata.required entity_name
 
-  let all (module V : VALIDABLE) =
-    let* files = read_child_files "articles" (Filepath.with_extension "md") in
-    let+ articles = Traverse.traverse (get_article (module V)) files in
-    let deps, articles =
-      Preface.Pair.Bifunctor.bimap Deps.Monoid.reduce (fun x ->
-          List.sort
-            (fun (a, _) (b, _) -> Date.compare b.Article.date a.Article.date)
-            x)
-      @@ List.split articles
-    in
-    Build.make deps (fun (meta, content) ->
-        return ({ meta with articles }, content))
+  let validate =
+    let open Data.Validation in
+    record (fun fields ->
+        let+ page = Page.validate_underlying_page fields in
+        { page; articles = [] })
 
-  let validate (type a) (module V : VALIDABLE with type t = a) o =
-    let open Validate.Applicative in
-    let+ common = Common.validate (module V) o in
-    { common; articles = [] }
+  let article (url, article) =
+    let open Data in
+    record (("url", string @@ Path.to_string url) :: Article.normalize article)
 
-  let from (type a) (module V : VALIDABLE with type t = a) obj =
-    V.object_and (validate (module V)) obj
+  let from_page = Task.lift (fun (page, articles) -> { page; articles })
 
-  let from_string (module V : VALIDABLE) = function
-    | None -> Error.(to_validate @@ Required_metadata [ "Articles" ])
-    | Some s -> Validate.Monad.(s |> V.from_string >>= from (module V))
+  let normalize { page; articles } =
+    let open Data in
+    ("has_articles", bool @@ not (List.is_empty articles))
+    :: ("articles", list_of article articles)
+    :: Page.normalize page
 
-  let inject (type a) (module L : INJECTABLE with type t = a)
-      { common; articles } =
-    let articles =
-      List.map
-        (fun (article, url) ->
-          let a = Article.inject (module L) article in
-          L.object_ (("url", L.string url) :: a))
-        articles
-    in
-    Common.inject (module L) common @ [ ("articles", L.list articles) ]
+  let sort = List.sort (fun (_, a) (_, b) -> ~-(Article.compare a b))
+
+  let fetch path =
+    Task.from_effect (fun () ->
+        let open Eff in
+        let* files =
+          read_directory ~on:`Source ~only:`Files path
+            ~where:(Path.has_extension "md")
+        in
+        let+ articles =
+          List.traverse
+            (fun file ->
+              let url =
+                Path.(
+                  file
+                  |> move ~into:(Path.abs [ "a" ])
+                  |> change_extension "html")
+              in
+              let+ meta, _ =
+                Eff.read_file_with_metadata
+                  (module Yocaml_yaml)
+                  (module Article)
+                  ~on:`Source file
+              in
+              (url, meta))
+            files
+        in
+        articles |> sort)
+
+  let index path =
+    let open Task in
+    lift (fun x -> (x, ())) >>> second (fetch path) >>> from_page
 end

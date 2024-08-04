@@ -10,15 +10,15 @@ bug-reports: "https://github.com/gr-im/site/issues"
 depends: [
   "dune" {>= "3.10"}
   "ocaml" {>= "5.0.0"}
-  "logs" {>= "0.7.0"}
+  "mdx" {>= "2.4.1"}
   "cmdliner" {>= "1.0.0"}
-  "yocaml" {= "1.0.0"}
-  "yocaml_unix" {= "1.0.0"}
-  "yocaml_yaml" {= "1.0.0"}
-  "yocaml_jingoo" {= "1.0.0"}
-  "yocaml_syndication" {= "1.0.0"}
-  "cmarkit" {= "0.3.0"}
-  "ocamlformat" {with-dev-setup & = "0.26.1"}
+  "yocaml"
+  "yocaml_eio"
+  "yocaml_yaml"
+  "yocaml_jingoo"
+  "yocaml_syndication"
+  "yocaml_omd"
+  "ocamlformat" {with-dev-setup & = "0.26.2"}
   "ocp-indent" {with-dev-setup}
   "merlin" {with-dev-setup}
   "utop" {with-dev-setup}
@@ -39,3 +39,12 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/gr-im/site.git"
+pin-depends: [
+  ["yocaml.dev" "git+https://gitlab.com/funkywork/yocaml.git"]
+  ["yocaml_runtime.dev" "git+https://gitlab.com/funkywork/yocaml.git"]
+  ["yocaml_jingoo.dev" "git+https://gitlab.com/funkywork/yocaml.git"]
+  ["yocaml_yaml.dev" "git+https://gitlab.com/funkywork/yocaml.git"]
+  ["yocaml_omd.dev" "git+https://gitlab.com/funkywork/yocaml.git"]
+  ["yocaml_eio.dev" "git+https://gitlab.com/funkywork/yocaml.git"]
+  ["yocaml_syndication.dev" "git+https://gitlab.com/funkywork/yocaml.git"]
+]
