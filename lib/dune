@@ -1,4 +1,4 @@
 (library
  (name generator)
  (public_name site.generator)
- (libraries yocaml yocaml_yaml yocaml_jingoo yocaml_omd))
+ (libraries yocaml yocaml_yaml yocaml_jingoo yocaml_omd yocaml_syndication))

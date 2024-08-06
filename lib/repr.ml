@@ -1,5 +1,11 @@
 open Yocaml
 
+let base_url = "https://gr-im.github.io"
+let feed_url = base_url ^ "/" ^ "atom.xml"
+
+let owner =
+  Yocaml_syndication.Person.make ~uri:base_url ~email:"grimfw@gmail.com" "Grim"
+
 module Page = struct
   type t = { title : string; description : string; tags : string list }
 
@@ -120,6 +126,17 @@ module Article = struct
           ^ Bib.to_string meta.bib ))
 
   let compare { date = a; _ } { date = b; _ } = Archetype.Datetime.compare a b
+
+  let to_atom_entry (url, { page; date; _ }) =
+    let open Yocaml_syndication in
+    let title = page.title in
+    let url = base_url ^ Path.to_string url in
+    let updated = Datetime.make date in
+    let categories = List.map Category.make page.tags in
+    let summary = Atom.text page.description in
+    let links = [ Atom.alternate url ~title ] in
+    Atom.entry ~links ~categories ~summary ~updated ~id:url
+      ~title:(Atom.text title) ()
 end
 
 module Articles = struct
@@ -178,4 +195,17 @@ module Articles = struct
   let index path =
     let open Task in
     lift (fun x -> (x, ())) >>> second (fetch path) >>> from_page
+
+  let to_atom path =
+    let open Task in
+    let open Yocaml_syndication in
+    let id = feed_url in
+    let title = Atom.text "Grim's web corner" in
+    let subtitle = Atom.text "Notes, essays and ramblings" in
+    let links = [ Atom.self feed_url; Atom.link base_url ] in
+    let updated = Atom.updated_from_entries () in
+    let authors = Yocaml.Nel.singleton owner in
+    fetch path
+    >>> Atom.from ~updated ~title ~subtitle ~id ~links ~authors
+          Article.to_atom_entry
 end

@@ -114,3 +114,13 @@ ol.bibliography > li .authors > li:first-child::before {
 .articles-list > li > p {
     font-style: italic;
 }
+
+.atom-btn {
+    margin-top: 12px;
+    display: inline-block;
+    background-color: #ff6600;
+    color: white;
+    text-decoration: none;
+    padding: 2px 4px;
+    font-weight: 900;
+}

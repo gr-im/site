@@ -51,6 +51,11 @@ let articles ~target =
   Action.batch ~only:`Files ~where:(Path.has_extension "md")
     (Path.rel [ "articles" ]) (article ~target)
 
+let atom ~target =
+  Action.write_static_file
+    Path.(target / "atom.xml")
+    (Repr.Articles.to_atom (Path.rel [ "articles" ]))
+
 let index ~target =
   let articles = Path.rel [ "articles" ] in
   Action.write_static_file
@@ -79,4 +84,5 @@ let all ~target () =
   >>= pages ~target
   >>= articles ~target
   >>= index ~target
+  >>= atom ~target
   >>= Action.store_cache cache
