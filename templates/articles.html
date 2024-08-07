@@ -7,7 +7,7 @@
 <ul class="articles-list">
   {%- for article in articles -%}
   <li>
-    <span class="date">{{ article.date.canonical }}</span>
+    <span class="date">{{ article.date.repr.date }}</span>
     <span class="title"
       ><a href="{{ article.url }}">{{ article.title }}</a></span
     >

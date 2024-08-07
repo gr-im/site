@@ -1,6 +1,7 @@
 <h1>{{ title }}</h1>
 <aside>
-  Published on <time datetime="{{ date.canonical}}">{{ date.canonical }}</time>
+  Published on
+  <time datetime="{{ date.repr.datetime }}">{{ date.repr.date }}</time>
 </aside>
 
 <article>
