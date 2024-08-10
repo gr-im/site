@@ -52,9 +52,12 @@ let articles ~target =
     (Path.rel [ "articles" ]) (article ~target)
 
 let atom ~target =
+  let articles = Path.rel [ "articles" ] in
   Action.write_static_file
     Path.(target / "atom.xml")
-    (Repr.Articles.to_atom (Path.rel [ "articles" ]))
+    (let open Task in
+     Pipeline.track_file articles
+     >>> Repr.Articles.to_atom (Path.rel [ "articles" ]))
 
 let index ~target =
   let articles = Path.rel [ "articles" ] in

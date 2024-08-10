@@ -1,0 +1,3 @@
+(library
+ (name article_lib)
+ (public_name site.article_lib))

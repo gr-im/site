@@ -47,6 +47,7 @@ plea against the usefulness of pattern matching. Indeed, I am instinctively
 convinced that, akin to the explicit ability to delineate algebraic types,
 pattern matching objectively enhances a language.
 
+
 ## The main idea behind the `fold` function
 
 We can offer an exceedingly broad definition of the `fold` function, which

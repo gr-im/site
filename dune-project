@@ -25,6 +25,7 @@
     yocaml_jingoo
     yocaml_syndication
     yocaml_omd
+
     (ocamlformat (and :with-dev-setup (= 0.26.2)))
     (ocp-indent :with-dev-setup)
     (merlin :with-dev-setup)

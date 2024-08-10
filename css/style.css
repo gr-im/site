@@ -22,7 +22,7 @@ body > header,
 body > main,
 body > footer {
     max-width: 960px;
-    margin: 0 64px;
+    margin: 0 32px;
 }
 
 body > header {
@@ -30,7 +30,7 @@ body > header {
 }
 
 body > main {
-    margin: 32px 64px;
+    margin: 32px 32px;
     flex: 1;
 }
 
@@ -113,6 +113,11 @@ ol.bibliography > li .authors > li:first-child::before {
 
 .articles-list > li > p {
     font-style: italic;
+}
+
+.hidden-block {
+    display: none;
+    margin: 0;
 }
 
 .atom-btn {
