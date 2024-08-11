@@ -1,6 +1,6 @@
 ---
 title: Sorting things, rank-aggregation (beginner's approach)
-date: 2024-08-08
+date: 2024-08-10
 description:
   Summary of a response about how to order products by their votes/reviews using 
   rank aggregation (using Shopify approach).
