@@ -5,7 +5,7 @@ let track_binary = Pipeline.track_file (Path.rel [ Sys.argv.(0) ])
 let css ~target =
   let target = Resolver.css ~target in
   Action.Static.write_file target
-  @@ Pipeline.pipe_files ~seperator:"\n"
+  @@ Pipeline.pipe_files ~separator:"\n"
        Path.[ rel [ "css"; "reset.css" ]; rel [ "css"; "style.css" ] ]
 
 let page ~target file =
