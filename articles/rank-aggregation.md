@@ -34,16 +34,15 @@ bib:
     authors: [Evan Miller]
 ---
 
-Last year, a friend of [Xavier Van de Woestyne][xvw] posed a question to him—one
-for which he had some inklings but lacked precise answers. Given his
-professional commitments, he requested that I provide a succinct response on his
-behalf. This article seeks to outline the issue concisely and offer a considered
-solution. As with many problems, knowing the name of the problem makes it much
-easier to find a solution. The goal of the response I provided (and, by
-extension, of this article) was to offer a _simple solution_ that could be
-easily integrated into an existing database. For the sake of clarity (and
-conciseness) in the article, **performance considerations are not taken into
-account**.
+Last year, a friend of [Xavier Van de Woestyne][xvw] asked him a question for
+which he had some inklings but lacked precise answers. Given his professional
+commitments, he requested that I provide a succinct response on his behalf. This
+article seeks to outline the issue concisely and offer a considered solution. As
+with many problems, knowing the name of the problem makes it much easier to find
+a solution. The goal of the response I provided (and, by extension, of this
+article) was to offer a _simple solution_ that could be easily integrated into
+an existing database. For the sake of clarity (and conciseness) in the article,
+**performance considerations are not taken into account**.
 
 <div class="hidden-block">
 
