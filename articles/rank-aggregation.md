@@ -146,12 +146,12 @@ percentage only if you are in the same slice.
 ```ocaml
 let slice_of data = 
   let p = result data |> Float.to_int in
-  if p = 100 then 8 else p / 9
+  if p = 100 then 8 else p / 8
 ```
 
 We assume that if we have a perfect score (`100`), we project the result into
-the last slice, `9`, so that the score can be compared with the results between
-`90` and 100 (_inclusive_). Now we can refine our heuristic so that it only
+the last slice, `8`, so that the score can be compared with the results between
+`~90` and 100 (_inclusive_). Now we can refine our heuristic so that it only
 produces a fine comparison when scores are present in the same slice:
 
 ```ocaml
