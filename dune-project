@@ -16,9 +16,12 @@
   (synopsis "My personal website")
   (description "Source code of the generator of my personal website")
   (depends
-    (ocaml (>= 5.3.0))
-    (mdx (>= 2.4.1))
-    (cmdliner (>= 1.0.0))
+   (ocaml (>= 5.3.0))
+   (mdx (>= 2.4.1))
+   (cmdliner (>= 1.0.0))
+   cmarkit
+   (hilite (>= 0.5.0))
+    
     yocaml
     yocaml_unix
     yocaml_yaml
@@ -26,8 +29,8 @@
     yocaml_syndication
     yocaml_cmarkit
 
-    (ocamlformat :with-dev-setup)
-    (ocp-indent :with-dev-setup)
-    (merlin :with-dev-setup)
-    (ocaml-lsp-server :with-dev-setup)
-    (utop :with-dev-setup)))
+   (ocamlformat :with-dev-setup)
+   (ocp-indent :with-dev-setup)
+   (merlin :with-dev-setup)
+   (ocaml-lsp-server :with-dev-setup)
+   (utop :with-dev-setup)))

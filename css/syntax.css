@@ -1,0 +1,70 @@
+/* Almost stolen from https://xvw.lol (Thanks!) */
+
+
+span[class*="storage-modifier"],
+span[class*="name-tag"],
+span[class*="stanza"],
+span[class*="keyword"] {
+    color: #000;
+    font-weight: 600;
+}
+
+span[class*="constant"] {
+    color: #333;
+    font-weight: 600;
+}
+
+span[class*="name-function"],
+span[class*="function-binding"] {
+  color: #000;
+}
+
+span[class*="storage-type"],
+span[class*="variable"] {
+  color: #555;
+  font-style: italic;
+}
+
+span[class*="inherited-class"],
+span[class*="atom"],
+span[class*="source"],
+span[class*="support"] {
+    color: #111;
+    font-weight: 500;
+}
+
+span[class*="comment"] {
+  color: #777;
+  font-style: italic;
+}
+
+span[class*="string"] {
+    color: #606060;
+    font-weight: 400;
+}
+
+span[class*="literal"],
+span[class*="numeric"] {
+    color: #000;
+    font-weight: 300;
+}
+
+.diff-punctuation-definition-deleted {
+  background-color: #ffdcd7;
+  color: #67060c;
+}
+
+.diff-punctuation-definition-inserted {
+  background-color: #aff5b4;
+  color: #033a16;
+}
+
+.diff-markup-deleted {
+  background-color: #ffdcd7;
+  color: #67060c;
+}
+
+.diff-markup-inserted {
+  background-color: #aff5b4;
+  color: #033a16;
+}

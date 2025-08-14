@@ -12,6 +12,8 @@ depends: [
   "ocaml" {>= "5.3.0"}
   "mdx" {>= "2.4.1"}
   "cmdliner" {>= "1.0.0"}
+  "cmarkit"
+  "hilite" {>= "0.5.0"}
   "yocaml"
   "yocaml_unix"
   "yocaml_yaml"
@@ -40,3 +42,12 @@ build: [
   ]
 ]
 dev-repo: "git+https://github.com/gr-im/site.git"
+pin-depends: [
+  ["yocaml.dev" "git+https://github.com/xhtmlboi/yocaml.git"]
+  ["yocaml_runtime.dev" "git+https://github.com/xhtmlboi/yocaml.git"]
+  ["yocaml_unix.dev" "git+https://github.com/xhtmlboi/yocaml.git"]
+  ["yocaml_cmarkit.dev" "git+https://github.com/xhtmlboi/yocaml.git"]
+  ["yocaml_jingoo.dev" "git+https://github.com/xhtmlboi/yocaml.git"]
+  ["yocaml_syndication.dev" "git+https://github.com/xhtmlboi/yocaml.git"]
+  ["yocaml_yaml.dev" "git+https://github.com/xhtmlboi/yocaml.git"]
+]
