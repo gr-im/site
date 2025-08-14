@@ -14,7 +14,7 @@ let page ~target file =
     (let open Task in
      track_binary
      >>> Yocaml_yaml.Pipeline.read_file_with_metadata (module Repr.Page) file
-     >>> Yocaml_omd.content_to_html ()
+     >>> Yocaml_cmarkit.content_to_html ()
      >>> Yocaml_jingoo.Pipeline.as_template
            (module Repr.Page)
            (Path.rel [ "templates"; "main.html" ]))
@@ -26,7 +26,7 @@ let article ~target file =
      track_binary
      >>> Yocaml_yaml.Pipeline.read_file_with_metadata (module Repr.Article) file
      >>> Repr.Article.prepare
-     >>> Yocaml_omd.content_to_html ()
+     >>> Yocaml_cmarkit.content_to_html ()
      >>> Yocaml_jingoo.Pipeline.as_template
            (module Repr.Article)
            (Path.rel [ "templates"; "article.html" ])
@@ -61,7 +61,7 @@ let index ~target =
            (module Repr.Page)
            (Path.rel [ "index.md" ])
      >>> first (Repr.Articles.index articles)
-     >>> Yocaml_omd.content_to_html ()
+     >>> Yocaml_cmarkit.content_to_html ()
      >>> Yocaml_jingoo.Pipeline.as_template
            (module Repr.Articles)
            (Path.rel [ "templates"; "articles.html" ])

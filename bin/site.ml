@@ -1,9 +1,9 @@
 let default_port = 8888
 let default_target = Yocaml.Path.rel [ "_site" ]
-let run_build target = Yocaml_eio.run ~level:`Debug (Generator.Rule.all ~target)
+let run_build target = Yocaml_unix.run ~level:`Debug (Generator.Rule.all ~target)
 
 let run_watch target port =
-  Yocaml_eio.serve ~target ~level:`Info ~port (Generator.Rule.all ~target)
+  Yocaml_unix.serve ~target ~level:`Info ~port (Generator.Rule.all ~target)
 
 module Cmd = struct
   open Cmdliner
