@@ -1,5 +1,11 @@
 /* Almost stolen from https://xvw.lol (Thanks!) */
 
+pre {
+    max-width: 100%;
+    display: block;
+    overflow-x: auto;
+    padding: 0.6rem;
+}
 
 span[class*="storage-modifier"],
 span[class*="name-tag"],
