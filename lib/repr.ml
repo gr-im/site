@@ -79,6 +79,7 @@ module Bib = struct
       ; ("authors", list_of string authors)
       ; ("year", option int year)
       ; ("url", string url)
+      ; ("has_year", bool (Option.is_some year))
       ]
 
   let to_string = list_to_bib (fun { ident; url; _ } -> (ident, url))

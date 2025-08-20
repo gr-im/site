@@ -10,6 +10,7 @@ referenced_humans:
 bib:
   - ident: xvw-ocaml
     title: "Why I chose OCaml as my primary language"
+    year: 2025
     authors: [Xavier Van de Woestyne]
     url: https://xvw.lol/en/articles/why-ocaml.html
   - ident: Kyo
@@ -18,19 +19,28 @@ bib:
     authors: [Flavio Brasil, and contributors]
   - ident: freer
     title: "Free and Freer Monads: Putting Monads Back into Closet"
+    year: 2015
     url: https://okmij.org/ftp/Computation/free-monad.html
     authors: [Oleg Kiselyov]
   - ident: object-layer
     url: https://caml.inria.fr/pub/docs/u3-ocaml/ocaml-objects.html
     title: "Using, Understanding, and Unraveling The OCaml Language: The object layer"
+    year: 2001
     authors: [Didier Remy]
+  - ident: mirage-poly-error
+    title: Error Handling in Mirage3
+    url: https://mirage.io/docs/mirage-3.0-errors
+    authors: [Thomas Gazagnaire]
+    year: 2017
   - ident: poly-error
     title: "Composable Error Handling"
+    year: 2018
     url: https://keleshev.com/composable-error-handling-in-ocaml
     authors: [Vladimir Keleshev]
   - ident: boring-haskell
     title: "Boring Haskell Manifesto"
     url: https://www.snoyman.com/blog/2019/11/boring-haskell-manifesto/
+    year: 2019
     authors: [Michael Snoyman]
 ---
 
@@ -365,8 +375,9 @@ Hello Pierre
 ```
 
 This approach is extremely similar to using [polymorphic
-variants](https://ocaml.org/manual/5.3/polyvariant.html) for
-[composable error
+variants](https://ocaml.org/manual/5.3/polyvariant.html), notably
+popularised by [Mirage 3](https://mirage.io/docs/mirage-3.0-errors),
+for [composable error
 handling](https://keleshev.com/composable-error-handling-in-ocaml),
 which share many features with objects (structural subtyping, rows).
 

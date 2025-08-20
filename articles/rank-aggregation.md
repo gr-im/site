@@ -18,19 +18,23 @@ bib:
     authors: [Wikipedia]
   - ident: reddit-comment
     title: "Reddit's new comment sorting system"
+    year: 2009
     url: http://web.archive.org/web/20140307091023/http://www.redditblog.com/2009/10/reddits-new-comment-sorting-system.html
     authors: [Randall Munroe]
   - ident: reddit-formula
     title: Deriving the Reddit Formula
     url: https://www.evanmiller.org/deriving-the-reddit-formula.html
     authors: [Evan Miller]
+    year: 2015
   - ident: not-sort-by-avg
     title: How Not To Sort By Average Rating
     url: https://www.evanmiller.org/how-not-to-sort-by-average-rating.html
+    year: 2009
     authors: [Evan Miller]
   - ident: ranking-star
     title: Ranking Items With Star Ratings
     url: https://www.evanmiller.org/ranking-items-with-star-ratings.html
+    year: 2014
     authors: [Evan Miller]
 ---
 
