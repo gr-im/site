@@ -88,6 +88,11 @@ let atom resolver =
   in
   Action.Static.write_file target pipeline
 
+let misc resolver =
+  Yocaml.Action.copy_file
+    ~into:(Resolver.Target.dir resolver)
+    (Resolver.Source.cname resolver)
+
 let all resolver () =
   let open Eff in
   let cache = Resolver.Target.cache resolver in
@@ -97,5 +102,6 @@ let all resolver () =
   >>= articles resolver
   >>= index resolver
   >>= atom resolver
+  >>= misc resolver
   >>= Action.remove_residuals ~target:(Resolver.Target.dir resolver)
   >>= Action.store_cache cache

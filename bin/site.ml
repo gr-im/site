@@ -1,6 +1,6 @@
 let default_port = 8888
 let default_target = Yocaml.Path.rel [ "_site" ]
-let default_base_url = "https://gr-im.github.io"
+let default_base_url = "https://grim.cargocut.org"
 
 let run_build target base_url =
   let resolver = Generator.Resolver.make ~target ~base_url () in

@@ -15,6 +15,7 @@ module Source : sig
   val index : t -> Yocaml.Path.t
   val css_files : t -> Yocaml.Path.t list
   val template : t -> string -> Yocaml.Path.t
+  val cname : t -> Yocaml.Path.t
 end
 
 module Target : sig

@@ -14,11 +14,13 @@ let make ?(source = Path.rel []) ?(target = Path.rel [ "_site" ])
 module Source = struct
   let dir { source; _ } = source
   let css resolver = Path.(dir resolver / "css")
+  let misc resolver = Path.(dir resolver / "misc")
   let templates resolver = Path.(dir resolver / "templates")
   let articles resolver = Path.(dir resolver / "articles")
   let pages resolver = Path.(dir resolver / "pages")
   let template resolver name = Path.(templates resolver / name)
   let index resolver = Path.(dir resolver / "index.md")
+  let cname resolver = Path.(misc resolver / "CNAME")
 
   let css_files resolver =
     [ "reset.css"; "syntax.css"; "style.css" ]
