@@ -1,13 +1,6 @@
 open Yocaml
 
-let track_binary = Pipeline.track_file (Path.from_string Sys.argv.(0))
-
-let from_markdown () =
-  let open Yocaml.Task in
-  Static.on_content
-    (Yocaml_cmarkit.to_doc ()
-    >>| Hilite_markdown.transform ~skip_unknown_languages:true
-    >>> Yocaml_cmarkit.from_doc_to_html ())
+let track_binary = Pipeline.track_file (Path.from_string Sys.executable_name)
 
 let css resolver =
   let target = Resolver.Target.css resolver in
@@ -17,29 +10,39 @@ let css resolver =
 
 let page resolver file =
   let target = Resolver.Target.page resolver file in
-  Action.Static.write_file_with_metadata target
-    (let open Task in
-     track_binary
-     >>> Yocaml_yaml.Pipeline.read_file_with_metadata (module Repr.Page) file
-     >>> from_markdown ()
-     >>> Yocaml_jingoo.Pipeline.as_template
-           (module Repr.Page)
-           (Resolver.Source.template resolver "main.html"))
+  let pipeline =
+    let open Task in
+    let+ () = track_binary
+    and+ metadata, content =
+      Yocaml_yaml.Pipeline.read_file_with_metadata (module Repr.Page) file
+    and+ apply_templates =
+      Yocaml_jingoo.read_templates
+        [ Resolver.Source.template resolver "main.html" ]
+    in
+    content
+    |> Yocaml_markdown.from_string_to_html
+    |> apply_templates (module Repr.Page) ~metadata
+  in
+  Action.Static.write_file target pipeline
 
 let article resolver file =
   let target = Resolver.Target.article resolver file in
-  Action.Static.write_file_with_metadata target
-    (let open Task in
-     track_binary
-     >>> Yocaml_yaml.Pipeline.read_file_with_metadata (module Repr.Article) file
-     >>> Repr.Article.prepare
-     >>> from_markdown ()
-     >>> Yocaml_jingoo.Pipeline.as_template
-           (module Repr.Article)
-           (Resolver.Source.template resolver "article.html")
-     >>> Yocaml_jingoo.Pipeline.as_template
-           (module Repr.Article)
-           (Resolver.Source.template resolver "main.html"))
+  let pipeline =
+    let open Task in
+    let+ () = track_binary
+    and+ metadata, content =
+      Yocaml_yaml.Pipeline.read_file_with_metadata (module Repr.Article) file
+    and+ apply_templates =
+      Yocaml_jingoo.read_templates
+        Resolver.Source.
+          [ template resolver "article.html"; template resolver "main.html" ]
+    in
+    let content = Repr.Article.add_footer metadata content in
+    content
+    |> Yocaml_markdown.from_string_to_html
+    |> apply_templates (module Repr.Article) ~metadata
+  in
+  Action.Static.write_file target pipeline
 
 let pages resolver =
   Action.batch ~only:`Files ~where:(Path.has_extension "md")
@@ -51,30 +54,39 @@ let articles resolver =
     (Resolver.Source.articles resolver)
     (article resolver)
 
+let index resolver =
+  let target = Resolver.Target.index resolver in
+  let articles = Resolver.Source.articles resolver in
+  let pipeline =
+    let open Task in
+    let+ () = track_binary
+    and+ articles = Repr.Articles.fetch resolver articles
+    and+ page, content =
+      Yocaml_yaml.Pipeline.read_file_with_metadata
+        (module Repr.Page)
+        (Resolver.Source.index resolver)
+    and+ apply_templates =
+      Yocaml_jingoo.read_templates
+        Resolver.Source.
+          [ template resolver "articles.html"; template resolver "main.html" ]
+    in
+    let metadata = Repr.Articles.from_page page articles in
+    content
+    |> Yocaml_markdown.from_string_to_html
+    |> apply_templates (module Repr.Articles) ~metadata
+  in
+  Action.Static.write_file target pipeline
+
 let atom resolver =
   let articles = Resolver.Source.articles resolver in
-  Action.Static.write_file
-    (Resolver.Target.atom resolver)
-    (Repr.Articles.to_atom resolver articles)
-
-let index resolver =
-  let articles = Resolver.Source.articles resolver in
-  Action.Static.write_file_with_metadata
-    (Resolver.Target.index resolver)
-    (let open Task in
-     track_binary
-     >>> Pipeline.track_file articles
-     >>> Yocaml_yaml.Pipeline.read_file_with_metadata
-           (module Repr.Page)
-           (Resolver.Source.index resolver)
-     >>> first (Repr.Articles.index resolver articles)
-     >>> from_markdown ()
-     >>> Yocaml_jingoo.Pipeline.as_template
-           (module Repr.Articles)
-           (Resolver.Source.template resolver "articles.html")
-     >>> Yocaml_jingoo.Pipeline.as_template
-           (module Repr.Articles)
-           (Resolver.Source.template resolver "main.html"))
+  let target = Resolver.Target.atom resolver in
+  let pipeline =
+    let open Task in
+    let+ () = track_binary
+    and+ feed = Repr.Articles.to_atom resolver articles in
+    Yocaml_syndication.Xml.to_string feed
+  in
+  Action.Static.write_file target pipeline
 
 let all resolver () =
   let open Eff in

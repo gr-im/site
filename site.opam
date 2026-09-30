@@ -19,7 +19,7 @@ depends: [
   "yocaml_yaml" {>= "3.0.1"}
   "yocaml_jingoo" {>= "3.0.1"}
   "yocaml_syndication" {>= "3.0.1"}
-  "yocaml_cmarkit" {>= "3.0.1"}
+  "yocaml_markdown" {>= "3.0.1"}
   "ocamlformat" {with-dev-setup}
   "ocp-indent" {with-dev-setup}
   "merlin" {with-dev-setup}

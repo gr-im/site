@@ -116,13 +116,11 @@ module Article = struct
       ; ("bib", list_of Bib.normalize bib)
       ]
 
-  let prepare =
-    Task.lift ~has_dynamic_dependencies:false (fun (meta, content) ->
-        ( meta
-        , content
-          ^ "\n\n"
-          ^ Human.to_string meta.referenced_humans
-          ^ Bib.to_string meta.bib ))
+  let add_footer meta content =
+    content
+    ^ "\n\n"
+    ^ Human.to_string meta.referenced_humans
+    ^ Bib.to_string meta.bib
 
   let compare { date = a; _ } { date = b; _ } = Archetype.Datetime.compare a b
 
@@ -154,7 +152,7 @@ module Articles = struct
     let open Data in
     record (("url", string @@ Path.to_string url) :: Article.normalize article)
 
-  let from_page = Task.lift (fun (page, articles) -> { page; articles })
+  let from_page page articles = { page; articles }
 
   let normalize { page; articles } =
     let open Data in
@@ -165,41 +163,33 @@ module Articles = struct
   let sort = List.sort (fun (_, a) (_, b) -> ~-(Article.compare a b))
 
   let fetch resolver path =
-    Task.from_effect (fun () ->
-        let open Eff in
-        let* files =
-          read_directory ~on:`Source ~only:`Files path
-            ~where:(Path.has_extension "md")
-        in
-        let+ articles =
-          List.traverse
-            (fun file ->
-              let url =
-                file
-                |> Resolver.Target.article resolver
-                |> Resolver.Server.from_target resolver
-              in
-              let+ meta, _ =
-                Eff.read_file_with_metadata
-                  (module Yocaml_yaml)
-                  (module Article)
-                  ~on:`Source file
-              in
-              (url, meta))
-            files
-        in
-        articles |> sort)
-
-  let index resolver path =
-    let open Task in
-    lift (fun x -> (x, ())) >>> second (fetch resolver path) >>> from_page
+    let open Yocaml.Task in
+    let+ articles =
+      Pipeline.fetch ~on:`Source ~only:`Files ~where:(Path.has_extension "md")
+        (fun file ->
+          let open Eff in
+          let url =
+            file
+            |> Resolver.Target.article resolver
+            |> Resolver.Server.from_target resolver
+          in
+          let+ meta, _ =
+            Eff.read_file_with_metadata
+              (module Yocaml_yaml)
+              (module Article)
+              ~on:`Source file
+          in
+          (url, meta))
+        path
+    in
+    articles |> sort
 
   let to_atom resolver path =
     let open Task in
     let open Yocaml_syndication in
     let base_url = Resolver.Server.base_url resolver in
     let feed_url =
-      Resolver.Server.url resolver (Resolver.Target.atom resolver)
+      Resolver.Server.url_from_target resolver (Resolver.Target.atom resolver)
     in
     let id = feed_url in
     let title = Atom.text "Grim's web corner" in
@@ -207,8 +197,8 @@ module Articles = struct
     let links = [ Atom.self feed_url; Atom.link base_url ] in
     let updated = Atom.updated_from_entries () in
     let authors = Yocaml.Nel.singleton (owner resolver) in
-    Pipeline.track_file path
-    >>> fetch resolver path
-    >>> Atom.from ~updated ~title ~subtitle ~id ~links ~authors
-          (Article.to_atom_entry resolver)
+    let+ articles = fetch resolver path in
+    Atom.feed ~updated ~title ~subtitle ~id ~links ~authors
+      (Article.to_atom_entry resolver)
+      articles
 end
