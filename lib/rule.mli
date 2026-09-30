@@ -1,1 +1,1 @@
-val all : target:Yocaml.Path.t -> unit -> unit Yocaml.Eff.t
+val all : Resolver.t -> unit -> unit Yocaml.Eff.t

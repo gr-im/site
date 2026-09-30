@@ -9,19 +9,14 @@ let from_markdown () =
     >>| Hilite_markdown.transform ~skip_unknown_languages:true
     >>> Yocaml_cmarkit.from_doc_to_html ())
 
-let css ~target =
-  let target = Resolver.css ~target in
+let css resolver =
+  let target = Resolver.Target.css resolver in
   Action.Static.write_file target
   @@ Pipeline.pipe_files ~separator:"\n"
-       Path.
-         [
-           rel [ "css"; "reset.css" ]
-         ; rel [ "css"; "syntax.css" ]
-         ; rel [ "css"; "style.css" ]
-         ]
+  @@ Resolver.Source.css_files resolver
 
-let page ~target file =
-  let target = Resolver.page ~target file in
+let page resolver file =
+  let target = Resolver.Target.page resolver file in
   Action.Static.write_file_with_metadata target
     (let open Task in
      track_binary
@@ -29,10 +24,10 @@ let page ~target file =
      >>> from_markdown ()
      >>> Yocaml_jingoo.Pipeline.as_template
            (module Repr.Page)
-           (Path.rel [ "templates"; "main.html" ]))
+           (Resolver.Source.template resolver "main.html"))
 
-let article ~target file =
-  let target = Resolver.article ~target file in
+let article resolver file =
+  let target = Resolver.Target.article resolver file in
   Action.Static.write_file_with_metadata target
     (let open Task in
      track_binary
@@ -41,53 +36,53 @@ let article ~target file =
      >>> from_markdown ()
      >>> Yocaml_jingoo.Pipeline.as_template
            (module Repr.Article)
-           (Path.rel [ "templates"; "article.html" ])
+           (Resolver.Source.template resolver "article.html")
      >>> Yocaml_jingoo.Pipeline.as_template
            (module Repr.Article)
-           (Path.rel [ "templates"; "main.html" ]))
+           (Resolver.Source.template resolver "main.html"))
 
-let pages ~target =
+let pages resolver =
   Action.batch ~only:`Files ~where:(Path.has_extension "md")
-    (Path.rel [ "pages" ]) (page ~target)
+    (Resolver.Source.pages resolver)
+    (page resolver)
 
-let articles ~target =
+let articles resolver =
   Action.batch ~only:`Files ~where:(Path.has_extension "md")
-    (Path.rel [ "articles" ]) (article ~target)
+    (Resolver.Source.articles resolver)
+    (article resolver)
 
-let atom ~target =
-  let articles = Path.rel [ "articles" ] in
+let atom resolver =
+  let articles = Resolver.Source.articles resolver in
   Action.Static.write_file
-    Path.(target / "atom.xml")
-    (let open Task in
-     Pipeline.track_file articles
-     >>> Repr.Articles.to_atom (Path.rel [ "articles" ]))
+    (Resolver.Target.atom resolver)
+    (Repr.Articles.to_atom articles)
 
-let index ~target =
-  let articles = Path.rel [ "articles" ] in
+let index resolver =
+  let articles = Resolver.Source.articles resolver in
   Action.Static.write_file_with_metadata
-    Path.(target / "index.html")
+    (Resolver.Target.index resolver)
     (let open Task in
      track_binary
      >>> Pipeline.track_file articles
      >>> Yocaml_yaml.Pipeline.read_file_with_metadata
            (module Repr.Page)
-           (Path.rel [ "index.md" ])
+           (Resolver.Source.index resolver)
      >>> first (Repr.Articles.index articles)
      >>> from_markdown ()
      >>> Yocaml_jingoo.Pipeline.as_template
            (module Repr.Articles)
-           (Path.rel [ "templates"; "articles.html" ])
+           (Resolver.Source.template resolver "articles.html")
      >>> Yocaml_jingoo.Pipeline.as_template
            (module Repr.Articles)
-           (Path.rel [ "templates"; "main.html" ]))
+           (Resolver.Source.template resolver "main.html"))
 
-let all ~target () =
+let all resolver () =
   let open Eff in
-  let cache = Path.(target / "cache") in
+  let cache = Resolver.Target.cache resolver in
   Action.restore_cache cache
-  >>= css ~target
-  >>= pages ~target
-  >>= articles ~target
-  >>= index ~target
-  >>= atom ~target
+  >>= css resolver
+  >>= pages resolver
+  >>= articles resolver
+  >>= index resolver
+  >>= atom resolver
   >>= Action.store_cache cache

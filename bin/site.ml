@@ -1,9 +1,17 @@
 let default_port = 8888
 let default_target = Yocaml.Path.rel [ "_site" ]
-let run_build target = Yocaml_unix.run ~level:`Debug (Generator.Rule.all ~target)
+let default_base_url = "https://gr-im.github.io"
 
-let run_watch target port =
-  Yocaml_unix.serve ~target ~level:`Info ~port (Generator.Rule.all ~target)
+let run_build target base_url =
+  let resolver = Generator.Resolver.make ~target ~base_url () in
+  Yocaml_unix.run ~level:`Debug (Generator.Rule.all resolver)
+
+let run_watch target base_url port =
+  let resolver = Generator.Resolver.make ~target ~base_url () in
+  Yocaml_unix.serve
+    ~target:(Generator.Resolver.Target.dir resolver)
+    ~level:`Info ~port
+    (Generator.Rule.all resolver)
 
 module Cmd = struct
   open Cmdliner
@@ -15,6 +23,11 @@ module Cmd = struct
   let docs = Manpage.s_common_options
   let exits = Cmd.Exit.defaults
   let version = "dev"
+
+  let url_arg =
+    let doc = "base url (root)" in
+    let arg = Arg.info ~doc ~docs [ "base_url"; "url"; "domain" ] in
+    Arg.(value @@ opt string default_base_url arg)
 
   let target_arg =
     let doc = "target directory" in
@@ -32,7 +45,7 @@ module Cmd = struct
   let build =
     let doc = "Build the website" in
     let info = Cmd.info "build" ~version ~doc ~exits in
-    let term = Term.(const run_build $ target_arg) in
+    let term = Term.(const run_build $ target_arg $ url_arg) in
     Cmd.v info term
 
   let watch =
@@ -41,7 +54,7 @@ module Cmd = struct
        rebuilds the site on each request."
     in
     let info = Cmd.info "watch" ~version ~doc ~exits in
-    let term = Term.(const run_watch $ target_arg $ port_arg) in
+    let term = Term.(const run_watch $ target_arg $ url_arg $ port_arg) in
     Cmd.v info term
 
   let index =

@@ -206,7 +206,8 @@ module Articles = struct
     let links = [ Atom.self feed_url; Atom.link base_url ] in
     let updated = Atom.updated_from_entries () in
     let authors = Yocaml.Nel.singleton owner in
-    fetch path
+    Pipeline.track_file path
+    >>> fetch path
     >>> Atom.from ~updated ~title ~subtitle ~id ~links ~authors
           Article.to_atom_entry
 end
