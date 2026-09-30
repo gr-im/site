@@ -55,7 +55,7 @@ let atom resolver =
   let articles = Resolver.Source.articles resolver in
   Action.Static.write_file
     (Resolver.Target.atom resolver)
-    (Repr.Articles.to_atom articles)
+    (Repr.Articles.to_atom resolver articles)
 
 let index resolver =
   let articles = Resolver.Source.articles resolver in
@@ -67,7 +67,7 @@ let index resolver =
      >>> Yocaml_yaml.Pipeline.read_file_with_metadata
            (module Repr.Page)
            (Resolver.Source.index resolver)
-     >>> first (Repr.Articles.index articles)
+     >>> first (Repr.Articles.index resolver articles)
      >>> from_markdown ()
      >>> Yocaml_jingoo.Pipeline.as_template
            (module Repr.Articles)
@@ -85,4 +85,5 @@ let all resolver () =
   >>= articles resolver
   >>= index resolver
   >>= atom resolver
+  >>= Action.remove_residuals ~target:(Resolver.Target.dir resolver)
   >>= Action.store_cache cache

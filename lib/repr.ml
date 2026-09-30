@@ -1,9 +1,7 @@
 open Yocaml
 
-let base_url = "https://gr-im.github.io"
-let feed_url = base_url ^ "/" ^ "atom.xml"
-
-let owner =
+let owner resolver =
+  let base_url = Resolver.Server.base_url resolver in
   Yocaml_syndication.Person.make ~uri:base_url ~email:"grimfw@gmail.com" "Grim"
 
 module Page = struct
@@ -128,10 +126,10 @@ module Article = struct
 
   let compare { date = a; _ } { date = b; _ } = Archetype.Datetime.compare a b
 
-  let to_atom_entry (url, { page; date; _ }) =
+  let to_atom_entry resolver (url, { page; date; _ }) =
     let open Yocaml_syndication in
+    let url = Resolver.Server.url_from_target resolver url in
     let title = page.title in
-    let url = base_url ^ Path.to_string url in
     let updated = Datetime.make date in
     let categories = List.map Category.make page.tags in
     let summary = Atom.text page.description in
@@ -166,7 +164,7 @@ module Articles = struct
 
   let sort = List.sort (fun (_, a) (_, b) -> ~-(Article.compare a b))
 
-  let fetch path =
+  let fetch resolver path =
     Task.from_effect (fun () ->
         let open Eff in
         let* files =
@@ -177,10 +175,9 @@ module Articles = struct
           List.traverse
             (fun file ->
               let url =
-                Path.(
-                  file
-                  |> move ~into:(Path.abs [ "a" ])
-                  |> change_extension "html")
+                file
+                |> Resolver.Target.article resolver
+                |> Resolver.Server.from_target resolver
               in
               let+ meta, _ =
                 Eff.read_file_with_metadata
@@ -193,21 +190,25 @@ module Articles = struct
         in
         articles |> sort)
 
-  let index path =
+  let index resolver path =
     let open Task in
-    lift (fun x -> (x, ())) >>> second (fetch path) >>> from_page
+    lift (fun x -> (x, ())) >>> second (fetch resolver path) >>> from_page
 
-  let to_atom path =
+  let to_atom resolver path =
     let open Task in
     let open Yocaml_syndication in
+    let base_url = Resolver.Server.base_url resolver in
+    let feed_url =
+      Resolver.Server.url resolver (Resolver.Target.atom resolver)
+    in
     let id = feed_url in
     let title = Atom.text "Grim's web corner" in
     let subtitle = Atom.text "Notes, essays and ramblings" in
     let links = [ Atom.self feed_url; Atom.link base_url ] in
     let updated = Atom.updated_from_entries () in
-    let authors = Yocaml.Nel.singleton owner in
+    let authors = Yocaml.Nel.singleton (owner resolver) in
     Pipeline.track_file path
-    >>> fetch path
+    >>> fetch resolver path
     >>> Atom.from ~updated ~title ~subtitle ~id ~links ~authors
-          Article.to_atom_entry
+          (Article.to_atom_entry resolver)
 end
