@@ -670,3 +670,14 @@ Thank you for reading (if you made it this far), and a special thanks
 to [Xavier Van de Woestyne][xvw] for his article that inspired me to
 write this one, and to [Jonathan Winandy][jwinandy] for showing me
 Kyo and helping me rephrase some sentences.
+
+### Update
+
+- The idea briefly outlined in this article has been distilled into a
+  small, usable library called
+  [Primavera](https://github.com/cargocut/primavera) (available on
+  [OPAM](https://opam.ocaml.org/packages/primavera/)), which is
+  already being used in the
+  [Pidgio](https://github.com/cargocut/pidgio) project.
+
+
