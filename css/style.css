@@ -129,3 +129,11 @@ ol.bibliography > li .authors > li:first-child::before {
     padding: 2px 4px;
     font-weight: 900;
 }
+
+th {
+    text-align: left;
+}
+
+th, td {
+    padding: 0.1rem 0.3rem;
+}
